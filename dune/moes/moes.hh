@@ -2,7 +2,7 @@
 #define DUNE_MOES_HH
 
 #include <dune/moes/MatrixMult.hh>
-#include <dune/moes/qrcol.hh>
+#include <dune/moes/gramSchmidt.hh>
 #include <dune/moes/vectorclass/vectorclass.h>
 #include <vector>
 #include <dune/moes/Utils.hh>
@@ -105,13 +105,13 @@ public:
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Qtmp, N, qCols, 2, 1);
+                gramSchmidt(Qtmp, N, qCols, 2, 1);
             }
             powerIteration(A_, Qtmp, Q, qCols, N);
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
             // Put EV stuff here
             getEigenvalues(Q, lambda, nev);
@@ -174,7 +174,7 @@ public:
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
             // Put EV stuff here
             getGenEigenvalues(bshifta, A_, Q, lambda, nev, sigma); // lambda is wrong
@@ -248,7 +248,7 @@ public:
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
             // Put EV stuff here
             getGenEigenvalues(bshifta, A_, Q, lambda, nev, sigma);
@@ -308,13 +308,13 @@ public:
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Qtmp, N, qCols, 2, 1);
+                gramSchmidt(Qtmp, N, qCols, 2, 1);
             }
             solver->moesInversePowerIteration(Qtmp, Q, N, nev);
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
             // Put EV stuff here
             getEigenvalues(Q, lambda, nev, sigma);
@@ -367,12 +367,12 @@ public:
         LUflops = solver->getFlops();
         while (cb)
         {
-            MultQSimpleShared(B, Q, BQ, qCols, N);
+            MultQSimple(B, Q, BQ, qCols, N);
             solver->moesInversePowerIteration(BQ, Q, N, nev);
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
             // Put EV stuff here
             getGenEigenvalues(ashiftb, B, Q, lambda, nev, sigma);
@@ -440,7 +440,7 @@ public:
             solver->moesInversePowerIteration(BQ, Q, N, nev);
             if (i % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
         }
         qToVEC(Q, x);
@@ -494,12 +494,12 @@ public:
         LUflops = solver->getFlops();
         while (cb)
         {
-            MultQSimpleShared(B, Q, BQ, qCols, N);
+            MultQSimple(B, Q, BQ, qCols, N);
             solver->moesInversePowerIteration(BQ, Q, N, nev);
             it++;
             if (it % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
             // Put EV stuff here
             getGenEigenvalues(ashiftb, B, Q, evs, nev, sigma);
@@ -573,7 +573,7 @@ public:
             solver->moesInversePowerIteration(BQ, Q, N, nev);
             if (i % qrFrequency == 0)
             {
-                qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+                gramSchmidt(Q, N, qCols, 2, 1);
             }
         }
         getGenEigenvalues(ashiftb, B, Q, evs, nev, sigma);
@@ -875,8 +875,8 @@ public:
         std::shared_ptr<double[]> Qtmp(new double[matrixSize]);
         std::shared_ptr<double[]> BQ(new double[matrixSize]);
         std::unique_ptr<double[]> evs(new double[qCols * 8]);
-        MultQSimpleShared(ashiftb, Q, Qtmp, qCols, N); // (A - \sigma B)x
-        MultQSimpleShared(B, Q, BQ, qCols, N);         // Bx
+        MultQSimple(ashiftb, Q, Qtmp, qCols, N); // (A - \sigma B)x
+        MultQSimple(B, Q, BQ, qCols, N);         // Bx
         size_t qIndex = 0;
         Vec4d qNewFirst, qNewSecond, qOldFirst, qOldSecond, evFirst, evSecond, bBbFirst, bBbSecond, qBFirst, qBSecond;
         for (size_t qCol = 0; qCol < qCols; qCol++)
@@ -1018,7 +1018,7 @@ void largestEVs(const MT &M, std::unique_ptr<double[]> &Q, const size_t qCols, c
         {
             //std::cout << "Before QR: Q[0] = " << Q[0] << std::endl;
             //printMatrix(Q, N, qCols * 8);
-            qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+            gramSchmidt(Q, N, qCols, 2, 1);
             //std::cout << "After QR: Q[0] = " << Q[0] << std::endl;
             // printMatrix(Q, N, qCols * 8);
             stop = checkIterationTolerance(Q, Qtmp, N, qCols, tolerance);
@@ -1049,13 +1049,13 @@ void largestEVsIterative(const MT &M, std::unique_ptr<double[]> &Q, const size_t
         it++;
         if (it % qrFrequency == 0)
         {
-            qrFixedBlockOptimizedDouble(Qtmp, N, qCols, 2, 1);
+            gramSchmidt(Qtmp, N, qCols, 2, 1);
         }
         powerIteration(M, Qtmp, Q, qCols, N);
         it++;
         if (it % qrFrequency == 0)
         {
-            qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+            gramSchmidt(Q, N, qCols, 2, 1);
         }
     }
     return;
@@ -1083,10 +1083,10 @@ void smallestEVsIterative(const MT &M, std::shared_ptr<double[]> &Q, const size_
         // Call QR Algorithm and check tolerance
         if (i % qrFrequency == 0)
         {
-            qrFixedBlockOptimizedDouble(Qtmp, N, qCols, 2, 1);
+            gramSchmidt(Qtmp, N, qCols, 2, 1);
         }
     }
-    qrFixedBlockOptimizedDouble(Q, N, qCols, 2, 1);
+    gramSchmidt(Q, N, qCols, 2, 1);
     return;
 }
 

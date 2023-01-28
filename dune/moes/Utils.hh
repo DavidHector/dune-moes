@@ -554,4 +554,123 @@ void normalizeVec(VEC &v)
         v[i] = v[i][0] / norm;
     }
 }
+
+template <class B, class Alloc>
+void setupSparsityPattern(Dune::BCRSMatrix<B, Alloc> &A, int N)
+{
+    typedef typename Dune::BCRSMatrix<B, Alloc> Matrix;
+    A.setSize(N * N, N * N, N * N * 5);
+    A.setBuildMode(Matrix::row_wise);
+
+    for (typename Dune::BCRSMatrix<B, Alloc>::CreateIterator i = A.createbegin(); i != A.createend(); ++i)
+    {
+        int x = i.index() % N; // x coordinate in the 2d field
+        int y = i.index() / N; // y coordinate in the 2d field
+
+        if (y > 0)
+            // insert lower neighbour
+            i.insert(i.index() - N);
+        if (x > 0)
+            // insert left neighbour
+            i.insert(i.index() - 1);
+
+        // insert diagonal value
+        i.insert(i.index());
+
+        if (x < N - 1)
+            //insert right neighbour
+            i.insert(i.index() + 1);
+        if (y < N - 1)
+            // insert upper neighbour
+            i.insert(i.index() + N);
+    }
+}
+
+template <class B, class Alloc>
+void setupLaplacian(Dune::BCRSMatrix<B, Alloc> &A, int N)
+{
+    typedef typename Dune::BCRSMatrix<B, Alloc>::field_type FieldType;
+
+    setupSparsityPattern(A, N);
+
+    B diagonal(static_cast<FieldType>(0)), bone(static_cast<FieldType>(0));
+
+    auto setDiagonal = [](auto &&scalarOrMatrix, const auto &value) {
+        auto &&matrix = Dune::Impl::asMatrix(scalarOrMatrix);
+        for (auto rowIt = matrix.begin(); rowIt != matrix.end(); ++rowIt)
+            (*rowIt)[rowIt.index()] = value;
+    };
+
+    setDiagonal(diagonal, 4.0);
+    setDiagonal(bone, -1.0);
+
+    for (typename Dune::BCRSMatrix<B, Alloc>::RowIterator i = A.begin(); i != A.end(); ++i)
+    {
+        int x = i.index() % N; // x coordinate in the 2d field
+        int y = i.index() / N; // y coordinate in the 2d field
+
+        /*    if(x==0 || x==N-1 || y==0||y==N-1){
+
+       i->operator[](i.index())=1.0;
+
+       if(y>0)
+       i->operator[](i.index()-N)=0;
+
+       if(y<N-1)
+       i->operator[](i.index()+N)=0.0;
+
+       if(x>0)
+       i->operator[](i.index()-1)=0.0;
+
+       if(x < N-1)
+       i->operator[](i.index()+1)=0.0;
+
+       }else*/
+        {
+
+            i->operator[](i.index()) = diagonal;
+
+            if (y > 0)
+                i->operator[](i.index() - N) = bone;
+
+            if (y < N - 1)
+                i->operator[](i.index() + N) = bone;
+
+            if (x > 0)
+                i->operator[](i.index() - 1) = bone;
+
+            if (x < N - 1)
+                i->operator[](i.index() + 1) = bone;
+        }
+    }
+}
+
+template <class B, class Alloc>
+void setupIdentitySparsityPattern(Dune::BCRSMatrix<B, Alloc> &A, int N)
+{
+    typedef typename Dune::BCRSMatrix<B, Alloc> Matrix;
+    A.setSize(N, N, N);
+    A.setBuildMode(Matrix::row_wise);
+    for (typename Dune::BCRSMatrix<B, Alloc>::CreateIterator i = A.createbegin(); i != A.createend(); ++i)
+    {
+        i.insert(i.index());
+    }
+}
+
+template <class B, class Alloc>
+void setupIdentity(Dune::BCRSMatrix<B, Alloc> &A, int N)
+{
+    typedef typename Dune::BCRSMatrix<B, Alloc>::field_type FieldType;
+    setupIdentitySparsityPattern(A, N);
+    for (typename Dune::BCRSMatrix<B, Alloc>::RowIterator i = A.begin(); i != A.end(); ++i)
+    {
+        auto bRows = i->operator[](i.index()).rows;
+        for (size_t brow = 0; brow < bRows; brow++)
+        {
+            i->operator[](i.index())[brow][brow] = 1.0;
+        }
+
+        //i->operator[](i.index()) = 1.0; // cant just assign 1 to the entire block, only the diagonal
+    }
+}
 #endif

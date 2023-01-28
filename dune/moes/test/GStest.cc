@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 
-#include <dune/moes/qrcol.hh>
+#include <dune/moes/gramSchmidt.hh>
 #include <dune/moes/naive.hh>
 #include <dune/moes/vectorclass/vectorclass.h>
 #include <dune/moes/flopUtils.hh>

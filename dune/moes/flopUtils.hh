@@ -11,9 +11,6 @@
 #endif
 #include <dune/istl/bvector.hh>
 #include <dune/istl/bcrsmatrix.hh>
-#include <dune/istl/test/laplacian.hh>
-#include <dune/istl/test/identity.hh>
-#include <dune/istl/matrixmatrix.hh>
 #include <dune/istl/matrixmarket.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/moes/MatrixMult.hh>
@@ -380,7 +377,7 @@ void singleThreadGS(const size_t &N, const size_t &W, const size_t &repetitions,
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t k = 0; k < repetitions; k++)
     {
-        qrFixedBlockOptimizedDouble(Q, N, W / 8);
+        gramSchmidt(Q, N, W / 8);
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
@@ -395,7 +392,7 @@ void singleThreadGSNaive(const size_t &N, const size_t &W, const size_t &repetit
     auto start = std::chrono::high_resolution_clock::now();
     for (size_t k = 0; k < repetitions; k++)
     {
-        qrNaiveQNaive(Q, N, W);
+        gramSchmidtNaive(Q, N, W);
     }
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start);
@@ -433,7 +430,7 @@ void singleThreadGSMT(std::shared_ptr<double[]> &Q, const size_t &N, const size_
 {
     for (size_t k = 0; k < repetitions; k++)
     {
-        qrFixedBlockOptimizedDouble(Q, N, W / 8);
+        gramSchmidt(Q, N, W / 8);
     }
 }
 
@@ -441,7 +438,7 @@ void singleThreadGSNaiveMT(std::shared_ptr<double[]> &Q, const size_t &N, const 
 {
     for (size_t k = 0; k < repetitions; k++)
     {
-        qrNaiveQNaive(Q, N, W);
+        gramSchmidtNaive(Q, N, W);
     }
 }
 

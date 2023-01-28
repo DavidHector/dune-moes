@@ -531,7 +531,7 @@ void qrNaive(double *Q, size_t numRows, size_t numCols, size_t blockSize, size_t
     Inefficient naive implementation of the modified Gram Schmidt algorithm, only for comparison.
     no blocks
 */
-void qrNaiveQNaive(double *Q, size_t numRows, size_t numCols)
+void gramSchmidtNaive(double *Q, size_t numRows, size_t numCols)
 {
     double u, v, unorm;
     double uv = 0.0;

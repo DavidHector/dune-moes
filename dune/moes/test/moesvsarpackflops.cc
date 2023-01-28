@@ -8,9 +8,6 @@
 #endif
 #include <dune/istl/bvector.hh>
 #include <dune/istl/bcrsmatrix.hh>
-#include <dune/istl/test/laplacian.hh>
-#include <dune/istl/test/identity.hh>
-#include <dune/istl/matrixmatrix.hh>
 #include <dune/istl/matrixmarket.hh>
 #include <dune/common/fmatrix.hh>
 #include <dune/moes/MatrixMult.hh>
@@ -69,4 +66,4 @@ int main(int argc, char const *argv[])
     // csnGenMinLapNeu<MAT, VEC>(genMinLapNeucsnOutFile);
     std::cout << "Complete." << std::endl;
     return 0;
-}
+};
