@@ -49,16 +49,6 @@ double flopsCompStdMinMag(size_t iterations, size_t N, size_t nev, size_t qrFreq
     return total;
 }
 
-void flopsCompGenMaxMag()
-{
-    //TODO
-}
-
-void flopsCompStdMaxMag()
-{
-    //TODO
-}
-
 /**
  * @brief Flop measurement for Matrices with kernel intersections (sequential execution)
  * 
@@ -217,14 +207,6 @@ void flopsParGenMinApproxFileRead(const std::string filenameA, const std::string
     outputFile.close();
 }
 
-void flopsSeqStdMinMag() {}
-
-void flopsParStdMinMag() {}
-
-void flopsSeqStdMaxMag() {}
-
-void flopsParStdMaxMag() {}
-
 template <typename MAT, typename VEC>
 void flopsSeqGenMinMagLap(const std::string filenameOut, const double tolerance = 1e-8, const double sigma = 0.01, const size_t qrFrequency = 1)
 {
@@ -301,7 +283,6 @@ void singleThreadGenMin(MAT &A, MAT &B, const double &epsilon, const int &nev, c
     moesST.computeGenMinMagnitude(B, epsilon, eigenvecs, eigenvals, nev, qrFrequency, sigma, L, U, LUflops, iterations);
 }
 
-//TODO: Parallel measurement
 template <typename MAT, typename VEC>
 void flopsParGenMinMagLap(const std::string filenameOut, const double tolerance = 1e-8, const double sigma = 0.01, const size_t qrFrequency = 1)
 {
@@ -715,13 +696,5 @@ void flopsMatmulMT(const std::string filenameOut)
     }
     outputFile.close();
 }
-
-void flopsParGenMinMag() {}
-
-void flopsSeqGenMaxMag() {}
-
-void flopsParGenMaxMag() {}
-
-// TODO: Compare all sequential things against arpack
 
 #endif

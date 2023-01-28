@@ -113,7 +113,6 @@ public:
             {
                 gramSchmidt(Q, N, qCols, 2, 1);
             }
-            // Put EV stuff here
             getEigenvalues(Q, lambda, nev);
             if (largestEvDiff(lambdatmp, lambda) < epsilon || it > nIterationsMax_)
             {
@@ -176,8 +175,7 @@ public:
             {
                 gramSchmidt(Q, N, qCols, 2, 1);
             }
-            // Put EV stuff here
-            getGenEigenvalues(bshifta, A_, Q, lambda, nev, sigma); // lambda is wrong
+            getGenEigenvalues(bshifta, A_, Q, lambda, nev, sigma);
             if (largestEvDiff(lambdatmp, lambda) < epsilon || it > nIterationsMax_)
             {
                 qToVEC(Q, x);
@@ -238,7 +236,6 @@ public:
         bshifta.axpy(-alpha, identity);
         std::vector<double> lambdatmp(lambda);
         fillMatrixRandom(Q, matrixSize);
-        // Make the shifted Matrix first and don't forget to recalc the eigenvalues
 
         auto solver = std::make_shared<Dune::UMFPackMOES<MAT>>(bshifta, false);
         while (cb)
@@ -250,7 +247,6 @@ public:
             {
                 gramSchmidt(Q, N, qCols, 2, 1);
             }
-            // Put EV stuff here
             getGenEigenvalues(bshifta, A_, Q, lambda, nev, sigma);
             if (largestEvDiff(lambdatmp, lambda) < epsilon || it > nIterationsMax_)
             {
@@ -316,7 +312,6 @@ public:
             {
                 gramSchmidt(Q, N, qCols, 2, 1);
             }
-            // Put EV stuff here
             getEigenvalues(Q, lambda, nev, sigma);
             if (largestEvDiff(lambdatmp, lambda) < epsilon || it > nIterationsMax_)
             {
@@ -374,11 +369,9 @@ public:
             {
                 gramSchmidt(Q, N, qCols, 2, 1);
             }
-            // Put EV stuff here
             getGenEigenvalues(ashiftb, B, Q, lambda, nev, sigma);
             if (largestEvDiff(lambdatmp, lambda) < epsilon || it > nIterationsMax_)
             {
-                // printQ(Q, qCols);
                 qToVEC(Q, x);
                 if (checkOrthonormality)
                 {
@@ -501,7 +494,6 @@ public:
             {
                 gramSchmidt(Q, N, qCols, 2, 1);
             }
-            // Put EV stuff here
             getGenEigenvalues(ashiftb, B, Q, evs, nev, sigma);
             if (largestEvDiff(evstmp, evs) < epsilon || it > nIterationsMax_)
             {
@@ -523,8 +515,6 @@ public:
             }
             evstmp = evs;
         }
-
-        // std::cout << "Moes.computeGenMinMagnitudeApprox iterations: " << it << std::endl;
         iterations = it;
     };
 
@@ -647,7 +637,6 @@ public:
     }
 
     // Get the norm || (I - QaQaT) QeQeT||
-    // This just takes too long, need to find better way (maybe the problem is also memory requirement, NxN is too much 8e12B = 8TB RAM, yeahhhh, 8e8 B= 800MB for the lowest case)
     double columnSumNorm(const std::vector<VEC> &qa, const std::vector<VEC> &qe)
     {
         if (qa[0].N() != N)
@@ -993,8 +982,6 @@ void pointerSwap(T **a, T **b)
     *a = *b;
     *b = tmp;
 }
-
-// add your classes here
 template <typename MT>
 void largestEVs(const MT &M, std::unique_ptr<double[]> &Q, const size_t qCols, const size_t N, const double tolerance, const size_t qrFrequency)
 {
@@ -1013,7 +1000,6 @@ void largestEVs(const MT &M, std::unique_ptr<double[]> &Q, const size_t qCols, c
         // Why do the pointer swap, I could just do two multiplications in each step
         fillMatrixRandom(M, Q, Qtmp, qCols, N);
 
-        // Call QR Algorithm and check tolerance
         if (iterationCounter % qrFrequency == 0)
         {
             //std::cout << "Before QR: Q[0] = " << Q[0] << std::endl;
@@ -1025,8 +1011,6 @@ void largestEVs(const MT &M, std::unique_ptr<double[]> &Q, const size_t qCols, c
             if (stop)
             {
                 std::cout << "largestEVs: Returning Q = " << std::endl;
-                // printMatrix(Q, N, qCols * 8);
-                // delete Qtmp;
                 std::cout << "largestEVs took " << iterationCounter << " iterations to complete" << std::endl;
                 return;
             }
@@ -1080,7 +1064,6 @@ void smallestEVsIterative(const MT &M, std::shared_ptr<double[]> &Q, const size_
         solver->moesInversePowerIteration(Q, Qtmp, xtmp, N, rhsWidth);
         //printMultivector(Q, N, qCols, 5);
 
-        // Call QR Algorithm and check tolerance
         if (i % qrFrequency == 0)
         {
             gramSchmidt(Qtmp, N, qCols, 2, 1);

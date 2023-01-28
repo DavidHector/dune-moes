@@ -49,14 +49,6 @@ void csnGenMinApprox(const std::string Afile, const std::string Bfile, const std
         std::vector<double> lambdas(rhsWidths[irhs] + 8, 0.0);
         std::vector<double> arlambdas(rhsWidths[irhs], 0.0);
         arpack.computeGenNonSymShiftInvertMinMagnitude(B, tolerance, arpacksevs, arlambdas, sigma);
-        /*
-        std::cout << "rhsWidth = " << rhsWidths[irhs] << std::endl;
-        std::cout << "norms for arpacks evs: " << std::endl;
-        for (size_t i = 0; i < arpacksevs.size(); i++)
-        {
-            std::cout << printNormVec(arpacksevs[i]) << std::endl;
-        }
-        */
         for (size_t i = 0; i < lenIterations; i++)
         {
             csnMoes.computeGenMinMagnitudeApproxIterations(B, evs, lambdas, rhsWidths[irhs] + 8, qrFrequency, sigma, alpha, L, U, LUflops, iterations[i]);
