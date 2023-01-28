@@ -20,3 +20,4 @@ See `dune/moes/test/minimalExample.cc`
 - [DUNE](https://dune-project.org/), needs at least dune-common and dune-istl
 - [UMFPACK](https://people.engr.tamu.edu/davis/suitesparse.html)
 - [ARPACK](https://github.com/opencollab/arpack-ng) (optional, only needed for comparison tests)
+- [vectorclass](https://github.com/vectorclass/version2)
